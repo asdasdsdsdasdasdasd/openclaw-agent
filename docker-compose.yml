@@ -1,0 +1,125 @@
+services:
+
+  # ---------------------------------------------------------------------------
+  # vLLM — serves Qwen3.5-35B-A3B MoE INT4 across both 5070 Ti GPUs
+  # ---------------------------------------------------------------------------
+  vllm:
+    # New GPUs (e.g. RTX 50 / Blackwell) need CUDA 13 user-space in the image.
+    # Override with VLLM_IMAGE in .env if you pin a specific digest.
+    image: ${VLLM_IMAGE:-vllm/vllm-openai:latest-cu130}
+    container_name: openclaw-vllm
+    restart: unless-stopped
+
+    # GPU access: expose both 5070 Ti cards
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # Filesystem isolation: only the model cache and this project dir
+    volumes:
+      - model-cache:/root/.cache/huggingface
+      - ./models:/models:ro
+      - ./vllm/entrypoint.sh:/entrypoint.sh:ro
+
+    # No host filesystem mounts beyond the above
+    read_only: false          # vLLM needs to write tmp files internally
+    # /tmp must have exec so Triton JIT .so files can be loaded after compilation.
+    tmpfs:
+      - /tmp:size=8g,exec
+
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      # Pass through .env so the container actually sees model settings (not only compose-time substitution).
+      MODEL_NAME: ${MODEL_NAME:-Qwen/Qwen3.5-27B-GPTQ-Int4}
+      MODEL_QUANTIZATION: ${MODEL_QUANTIZATION:-gptq_marlin}
+      MODEL_DTYPE: ${MODEL_DTYPE:-float16}
+      TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-2}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-32768}
+      GPU_MEMORY_UTILIZATION: ${GPU_MEMORY_UTILIZATION:-0.90}
+      NCCL_P2P_DISABLE: "0"   # keep NVLink/PCIe P2P enabled for TP
+      NCCL_DEBUG: WARN
+      # Redirect Triton / TorchInductor caches out of /tmp into the container writable layer.
+      # Without this, compiled .so files land in /tmp and fail to mmap when /tmp is noexec.
+      TRITON_CACHE_DIR: /root/.cache/triton
+      TORCHINDUCTOR_CACHE_DIR: /root/.cache/torchinductor
+      VLLM_COMPILE_CACHE_DIR: /root/.cache/vllm_compile
+
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+
+    ports:
+      - "127.0.0.1:${VLLM_PORT:-8000}:8000"   # only localhost — app talks to it directly
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 600s       # first run: model download + load + Triton compile ≈ 5-10 min
+
+    networks:
+      - openclaw-net
+
+  # ---------------------------------------------------------------------------
+  # openclaw app — isolated to this directory only
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: openclaw-app
+    restart: unless-stopped
+
+    depends_on:
+      vllm:
+        condition: service_healthy
+
+    # Strict filesystem isolation:
+    #   - only this project directory is mounted (read-write)
+    #   - everything else is read-only or absent
+    volumes:
+      - .:/workspace:rw          # only this directory
+    read_only: true              # container root fs is read-only
+    tmpfs:
+      - /tmp:size=512m
+      - /app/.cache:size=256m   # for pip/runtime cache inside container
+
+    environment:
+      VLLM_BASE_URL: http://vllm:8000/v1
+      MODEL_NAME: ${MODEL_NAME:-Qwen/Qwen3.5-27B-GPTQ-Int4}
+      APP_HOST: ${APP_HOST:-0.0.0.0}
+      APP_PORT: ${APP_PORT:-8080}
+
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+    # Security: drop all capabilities, no privilege escalation
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - openclaw-net
+
+# ---------------------------------------------------------------------------
+# Networking: isolated bridge — no external access except declared ports
+# ---------------------------------------------------------------------------
+networks:
+  openclaw-net:
+    driver: bridge
+    internal: false   # vLLM needs HuggingFace access on first run to download model
+
+# ---------------------------------------------------------------------------
+# Volumes
+# ---------------------------------------------------------------------------
+volumes:
+  model-cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./model-cache   # keeps model weights inside this project dir

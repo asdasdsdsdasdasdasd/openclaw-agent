@@ -1,0 +1,16 @@
+{
+  "name": "job-agent",
+  "version": "1.0.0",
+  "description": "Current production flow uses OpenClaw + DeepSeek API to run JobsDB internal applications end-to-end.",
+  "main": "jobsdb_automator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "ws": "^8.21.0"
+  }
+}

@@ -1,0 +1,23 @@
+region: Hong Kong
+sources:
+  - name: linkedin_jobs
+    enabled: false
+    mode: browser_then_search
+    query: "site:hk.linkedin.com/jobs/view (\"machine learning\" OR \"artificial intelligence\" OR \"ai engineer\") \"Hong Kong\""
+  - name: jobsdb_jobstreet_hk
+    enabled: true
+    mode: browser_then_search
+    query: "site:hk.jobsdb.com/hk/en/job (\"machine learning engineer\" OR \"ai engineer\" OR \"machine learning\") \"Hong Kong\""
+  - name: ctgoodjobs_hk
+    enabled: true
+    mode: search
+    query: "site:jobs.ctgoodjobs.hk/job (\"machine learning\" OR \"ai engineer\" OR \"llm developer\") \"Hong Kong\""
+dedupeKey:
+  - company
+  - role
+  - location
+  - postedDate
+blacklistKeywords:
+  - unpaid
+  - commission only
+  - internship

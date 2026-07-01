@@ -1,0 +1,17 @@
+{
+  "siteUrl": "https://bet.hkjc.com/ch/football/results",
+  "defaultDateRange": {
+    "start": "01/06/2026",
+    "end": "30/06/2026",
+    "display": "01/06/2026 - 30/06/2026"
+  },
+  "output": {
+    "matchesJson": "hkjc-football-agent/output/matches.json",
+    "cornersJson": "hkjc-football-agent/output/corners-sample.json",
+    "fullRecordsJson": "hkjc-football-agent/output/june-full-records.json"
+  },
+  "pagination": {
+    "selector": ".pagination-box",
+    "maxPages": 100
+  }
+}

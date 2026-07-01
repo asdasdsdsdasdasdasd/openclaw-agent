@@ -1,0 +1,30 @@
+{
+  "region": "Hong Kong",
+  "targetRecipient": "you@example.edu.hk",
+  "maxLeadsPerRun": 8,
+  "platformOrder": ["jobsdb", "ctgoodjobs"],
+  "searchKeywords": ["ai", "machine learning", "data scientist", "llm"],
+  "perKeywordLeadLimit": 50,
+  "skipPreviouslySearchedJobs": true,
+  "searchedHistoryRetentionDays": 7,
+  "maxJobAgeDays": 7,
+  "maxPagesPerKeyword": 8,
+  "draftOnly": true,
+  "allowedRecipients": ["you@example.edu.hk"],
+  "sendRatePerMinute": 3,
+  "targetEmailsPerRun": 5,
+  "retryCount": 2,
+  "minSalaryHkd": 25000,
+  "maxSalaryHkd": 35000,
+  "maxRequiredExperienceYears": 1,
+  "minSkillOverlap": 1,
+  "email": {
+    "smtpServer": "smtp.gmail.com",
+    "smtpPort": 587,
+    "senderEnv": "EMAIL_SENDER",
+    "passwordEnv": "EMAIL_SMTP_PASSWORD"
+  },
+  "attachments": {
+    "cvPath": "/path/to/your/cv.pdf"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CandidateProfile",
+  "type": "object",
+  "required": [
+    "fullName",
+    "headline",
+    "location",
+    "email",
+    "phone",
+    "yearsOfExperience",
+    "skills",
+    "industries",
+    "achievements",
+    "evidence"
+  ],
+  "properties": {
+    "fullName": { "type": "string", "minLength": 1 },
+    "headline": { "type": "string", "minLength": 1 },
+    "location": { "type": "string", "minLength": 1 },
+    "email": { "type": "string", "minLength": 3 },
+    "phone": { "type": "string", "minLength": 3 },
+    "yearsOfExperience": { "type": "number", "minimum": 0 },
+    "skills": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "industries": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "achievements": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Directly verifiable claims grounded in CV text",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "targetRoles": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "additionalProperties": true
+}

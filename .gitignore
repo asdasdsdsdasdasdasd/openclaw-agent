@@ -1,0 +1,66 @@
+# Secrets
+.env
+.env.*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Scrape outputs & runtime (large / regeneratable)
+hkjc-football-agent/data/*.db
+hkjc-football-agent/data/*.db-*
+hkjc-football-agent/logs/
+hkjc-football-agent/output/
+
+# Large local assets (do not push to GitHub)
+models/
+llama.cpp/
+
+# Model cache
+model-cache/
+!model-cache/.gitkeep
+
+# IDE / editor
+.specstory/
+.cursor/
+.vscode/
+*.swp
+.DS_Store
+
+# Local scrape samples at repo root (regeneratable)
+hkjc-*.json
+dates.xlsx
+
+# Job agent runtime / personal data
+job-agent/node_modules/
+job-agent/logs/
+job-agent/config.json
+job-agent/candidate-profile.json
+job-agent/sent-applications*.json*
+job-agent/rejected-leads*.json*
+job-agent/searched-jobs.json
+job-agent/job-leads.json
+job-agent/send-queue.json
+job-agent/scraper_status.json
+job-agent/*_jobs*.json
+job-agent/all_batch_jobs.json
+job-agent/initial_jobs.json
+job-agent/additional_jobs.json
+
+# Scholarship agent runtime / personal data
+scholarship-agent/config.json
+scholarship-agent/login-ready.json
+scholarship-agent/downloaded-emails*.json*
+scholarship-agent/logs/
+scholarship-agent/downloads/
+
+# HKJC football agent (see hkjc-football-agent/.gitignore patterns above)
+hkjc-football-agent/node_modules/
+
+# Empty / local-only dirs
+# (vllm/entrypoint.sh is required by docker-compose — do not ignore)

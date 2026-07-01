@@ -1,0 +1,18 @@
+{
+  "provider": "outlook",
+  "outlookLoginUrl": "https://outlook.office.com/mail/",
+  "outlookMailUrl": "https://outlook.office.com/mail/",
+  "loginReadyFile": "scholarship-agent/login-ready.json",
+  "outputDir": "scholarship-agent/downloads",
+  "attachmentsSubdir": "attachments",
+  "manifestFile": "scholarship-agent/downloaded-emails.json",
+  "manifestLogFile": "scholarship-agent/downloaded-emails.log.jsonl",
+  "skipAlreadyDownloaded": true,
+  "maxEmailsPerRun": 200,
+  "searchQueries": ["scholarship", "fellowship", "獎學金", "助學金"],
+  "matchKeywords": ["scholarship", "fellowship", "bursary", "獎學金"],
+  "excludeKeywords": ["job offer", "interview invitation", "newsletter"],
+  "foldersToScan": ["Inbox", "All Mail"],
+  "saveFormats": ["body.txt", "metadata.json"],
+  "model": "deepseek/deepseek-chat"
+}
